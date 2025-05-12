@@ -113,22 +113,43 @@ async def update_item(table, pk_value: str, pk_name: str, update_data: Dict[str,
     timestamp = get_current_timestamp()
     update_expression = "SET updated_at = :updated_at"
     expression_attribute_values = {":updated_at": timestamp}
+    expression_attribute_names = {}
+
+    # DynamoDB reserved keywords
+    reserved_keywords = [
+        "name", "timestamp", "user", "status", "date", "year", "month", "day",
+        "time", "index", "count", "size", "type", "key", "value", "order"
+    ]
 
     for key, value in update_data.items():
         if key not in [pk_name, sk_name, "created_at"]:
-            update_expression += f", {key} = :{key}"
+            # Check if the attribute name is a reserved keyword
+            if key.lower() in reserved_keywords:
+                # Use expression attribute names for reserved keywords
+                attribute_name = f"#{key}"
+                expression_attribute_names[attribute_name] = key
+                update_expression += f", {attribute_name} = :{key}"
+            else:
+                update_expression += f", {key} = :{key}"
+
             expression_attribute_values[f":{key}"] = value
 
     key = {pk_name: pk_value}
     if sk_name and sk_value:
         key[sk_name] = sk_value
 
-    response = table.update_item(
-        Key=key,
-        UpdateExpression=update_expression,
-        ExpressionAttributeValues=expression_attribute_values,
-        ReturnValues="ALL_NEW"
-    )
+    update_kwargs = {
+        "Key": key,
+        "UpdateExpression": update_expression,
+        "ExpressionAttributeValues": expression_attribute_values,
+        "ReturnValues": "ALL_NEW"
+    }
+
+    # Only include ExpressionAttributeNames if we have any
+    if expression_attribute_names:
+        update_kwargs["ExpressionAttributeNames"] = expression_attribute_names
+
+    response = table.update_item(**update_kwargs)
 
     return response.get("Attributes", {})
 
