@@ -39,7 +39,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest pytest-asyncio pytest-cov awscli
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        python -c "import nltk; nltk.download('vader_lexicon'); nltk.download('stopwords'); nltk.download('punkt')"
+        export NLTK_DATA=$HOME/nltk_data
+        mkdir -p $NLTK_DATA
+        python -c "import nltk; nltk.download('vader_lexicon', download_dir='$NLTK_DATA'); nltk.download('stopwords', download_dir='$NLTK_DATA'); nltk.download('punkt', download_dir='$NLTK_DATA')"
 
     - name: Create .env file
       run: |
@@ -66,6 +68,7 @@ jobs:
 
     - name: Test with pytest
       run: |
+        export NLTK_DATA=$HOME/nltk_data
         mkdir -p reports
         # Run only unit tests for now to avoid complex setup for integration tests
         pytest backend/tests/test_nlp_service.py -v --cov=backend.services.nlp_service --cov-report=xml
