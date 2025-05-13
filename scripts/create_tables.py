@@ -207,6 +207,34 @@ tables = [
             "ReadCapacityUnits": 5,
             "WriteCapacityUnits": 5
         }
+    },
+    {
+        "TableName": "Feedback",
+        "KeySchema": [
+            {"AttributeName": "feedback_id", "KeyType": "HASH"},
+            {"AttributeName": "user_id", "KeyType": "RANGE"}
+        ],
+        "AttributeDefinitions": [
+            {"AttributeName": "feedback_id", "AttributeType": "S"},
+            {"AttributeName": "user_id", "AttributeType": "S"}
+        ],
+        "GlobalSecondaryIndexes": [
+            {
+                "IndexName": "UserIdIndex",
+                "KeySchema": [
+                    {"AttributeName": "user_id", "KeyType": "HASH"}
+                ],
+                "Projection": {"ProjectionType": "ALL"},
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": 5,
+                    "WriteCapacityUnits": 5
+                }
+            }
+        ],
+        "ProvisionedThroughput": {
+            "ReadCapacityUnits": 5,
+            "WriteCapacityUnits": 5
+        }
     }
 ]
 

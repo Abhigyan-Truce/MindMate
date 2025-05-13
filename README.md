@@ -15,11 +15,13 @@ A comprehensive mental health support application with medicine reminder functio
 
 ## AI-Powered Mental Health Support
 
-The application includes an advanced AI-powered chatbot that provides personalized mental health support:
+The application includes advanced AI features that provide personalized mental health support:
 
 ### Features
 
-- **Conversational Interface**: Natural, empathetic conversations with users
+- **Conversational Interface**: Natural, empathetic conversations with users through the AI chatbot
+- **Context-Aware Recommendations**: Personalized journal prompts and coping strategies based on mood and journal sentiment
+- **Sentiment Analysis**: Automatic analysis of journal entries to detect emotional states
 - **Context-Aware Responses**: Personalized support based on user's mood, medications, journal entries, and assessment results
 - **Evidence-Based Guidance**: Responses informed by trusted mental health resources using RAG (Retrieval-Augmented Generation)
 - **Crisis Detection**: Automatic detection of crisis situations with appropriate support resources
@@ -47,7 +49,8 @@ The chatbot personalizes responses based on:
 
 ## Tech Stack
 
-- **Backend**: FastAPI (Python)
+### Backend
+- **Framework**: FastAPI (Python)
 - **Database**: AWS DynamoDB
 - **Storage**: AWS S3
 - **AI/ML**:
@@ -56,10 +59,22 @@ The chatbot personalizes responses based on:
   - FAISS for vector storage and similarity search
   - PyPDF for document processing
 
+### Frontend
+- **Framework**: React 18 with Vite
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom design system
+- **State Management**: Zustand
+- **Form Handling**: React Hook Form
+- **HTTP Client**: Axios
+- **Routing**: React Router v6
+- **Data Visualization**: Chart.js with react-chartjs-2
+
 ## Documentation
 
 - [Postman Guide](POSTMAN_GUIDE.md): Detailed instructions for testing the API with Postman
 - [RAG Implementation](RAG_IMPLEMENTATION.md): Technical details about the RAG system
+- [AI Features](AI_FEATURES.md): Documentation of the AI recommendation features
+- [Frontend README](frontend/README.md): Documentation for the frontend module
 
 ## Getting Started
 
@@ -68,13 +83,14 @@ The chatbot personalizes responses based on:
 - Python 3.12+
 - AWS Account (for DynamoDB and S3)
 - Google API Key (for Gemini Pro)
+- NLTK (for natural language processing)
 
 ### Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/medical_support_reminder.git
-   cd medical_support_reminder
+   git clone https://github.com/Abhigyan-Truce/MindMate.git
+   cd MindMate
    ```
 
 2. Create a virtual environment:
@@ -101,6 +117,8 @@ The chatbot personalizes responses based on:
 
 ### Running the Application
 
+#### Backend
+
 Start the FastAPI server:
 ```bash
 python run.py
@@ -112,6 +130,32 @@ uvicorn backend.main:app --reload --host 0.0.0.0 --port 8001
 ```
 
 The API will be available at http://localhost:8001, and the API documentation at http://localhost:8001/api/docs.
+
+#### Frontend
+
+Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+Install dependencies:
+```bash
+npm install
+```
+
+Create a `.env` file in the frontend directory with the following variables:
+```env
+VITE_API_URL=http://localhost:8001
+```
+
+Start the development server:
+```bash
+npm run dev
+```
+
+The frontend will be available at http://localhost:3000 (or another port if 3000 is in use).
+
+For detailed information about the frontend, see the [Frontend README](frontend/README.md).
 
 ### Docker
 
@@ -167,8 +211,12 @@ docker run -p 8001:8001 --env-file .env mental-health-app
 ### AI Support
 - `POST /api/ai/chat`: Send a message to the chatbot
 - `GET /api/ai/chat/history`: Get chat history
-- `GET /api/ai/recommendations`: Get personalized recommendations
+- `GET /api/ai/recommendations`: Get personalized journal prompts and coping strategies based on mood and journal sentiment
+- `GET /api/ai/legacy-recommendations`: Get legacy personalized recommendations (deprecated)
+- `GET /api/ai/suggestions`: Get AI suggestions based on user context
 - `GET /api/ai/weekly-report`: Get weekly progress report
+- `POST /api/ai/feedback`: Submit feedback on AI suggestions
+- `GET /api/ai/visualization_data`: Get data for visualizations
 
 ## License
 

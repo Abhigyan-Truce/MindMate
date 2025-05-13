@@ -18,7 +18,7 @@ async def create_mood_entry(
     """Create a new mood entry."""
     mood_entry = await mood_service.create_mood_entry(
         current_user["user_id"],
-        mood_data.dict()
+        mood_data.model_dump()
     )
     return mood_entry
 

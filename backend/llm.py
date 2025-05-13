@@ -13,7 +13,7 @@ def get_personalized_coping_strategies(user_input: str):
     """
     This function takes user input and returns a list of personalized coping strategies.
     """
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=settings.GEMINI_API_KEY)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-001", google_api_key=settings.GEMINI_API_KEY)
     prompt = f"Provide a list of personalized coping strategies for the following situation: {user_input}"
     response = llm.invoke(prompt)
     return response.content

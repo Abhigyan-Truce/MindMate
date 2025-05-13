@@ -3,11 +3,13 @@ AI service for mental health support.
 """
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
+from backend.db.dynamodb import feedback_table, chat_history_table, create_item, get_item, update_item, delete_item, query_items
 from backend.db.dynamodb import chat_history_table, create_item, get_item, update_item, delete_item, query_items
 from backend.core.exceptions import NotFoundException
 from backend.core.utils import generate_uuid, get_current_timestamp
 from backend.config import settings
 from backend.rag import get_rag_response
+from backend.services import nlp_service
 from backend.services import mood_service, journal_service, medication_service, reminder_service
 
 # Crisis keywords and phrases
@@ -50,6 +52,16 @@ async def get_user_context(user_id: str) -> Dict[str, Any]:
     """Get context about the user for personalized responses."""
     context = {}
 
+    # Get user data
+    try:
+        from backend.db.dynamodb import get_user_by_id
+        user = await get_user_by_id(user_id)
+        if user:
+            context["user_preferences"] = user.get("preferences", {})
+    except Exception as e:
+        print(f"Error getting user data: {e}")
+        pass
+
     # Get recent mood entries
     try:
         mood_entries = await mood_service.list_mood_entries(user_id, limit=5)
@@ -68,6 +80,10 @@ async def get_user_context(user_id: str) -> Dict[str, Any]:
         journal_entries = await journal_service.list_journal_entries(user_id, limit=3)
         if journal_entries:
             context["recent_journal_entries"] = journal_entries
+            # Analyze journal entries for sentiment and keywords
+            for entry in journal_entries:
+                entry["sentiment"] = nlp_service.analyze_sentiment(entry["text"])
+                entry["keywords"] = nlp_service.extract_keywords(entry["text"])
     except Exception:
         # Continue even if journal data is not available
         pass
@@ -340,5 +356,64 @@ Format the report with clear sections and bullet points where appropriate."""
     # Get response from LLM
     from backend.llm import get_llm_response
     report = get_llm_response(prompt)
-
     return report
+
+async def generate_ai_suggestions(user_id: str) -> Dict[str, Any]:
+    """Generate AI suggestions based on user context."""
+    # Get user context
+    user_context = await get_user_context(user_id)
+
+    # Create suggestions based on context
+    suggestions = {}
+
+    # Add suggestions based on mood
+    if "recent_moods" in user_context and user_context["recent_moods"]:
+        recent_mood = user_context["recent_moods"][0]
+        if recent_mood["mood_rating"] < 4:
+            suggestions["journal_prompt"] = "What is causing you to feel this way?"
+            suggestions["coping_tip"] = "Try a short mindfulness meditation."
+            suggestions["motivational_content"] = "Remember that it's okay to have bad days."
+        elif recent_mood["mood_rating"] > 7:
+            suggestions["journal_prompt"] = "What is making you feel so good today?"
+            suggestions["coping_tip"] = "Continue your positive habits."
+            suggestions["motivational_content"] = "Share your positive energy with others."
+        else:
+            suggestions["journal_prompt"] = "Reflect on your day and identify any positive or negative experiences."
+            suggestions["coping_tip"] = "Practice self-care activities."
+            suggestions["motivational_content"] = "Focus on the present moment."
+
+    # Add suggestions based on medication adherence
+    if "medications" in user_context and user_context["medications"]:
+        medications = user_context["medications"]
+        for medication in medications:
+            # Check if medication has a name
+            if "name" in medication:
+                suggestions["medication_tip"] = f"Remember to take your {medication['name']} as prescribed."
+                break
+
+    return suggestions
+
+
+async def get_visualization_data(user_id: str, data_type: str) -> List[Dict[str, Any]]:
+    """Get data for visualizations."""
+    if data_type == "mood":
+        data = await mood_service.list_mood_entries(user_id)
+    elif data_type == "medication":
+        data = await reminder_service.list_reminders(user_id)
+    elif data_type == "journal":
+        data = await journal_service.list_journal_entries(user_id)
+    else:
+        raise ValueError("Invalid data type")
+
+    return data
+
+
+async def submit_feedback(user_id: str, feedback: str) -> None:
+    """Submit feedback on AI suggestions."""
+    # Store feedback in DynamoDB
+    feedback_data = {
+        "user_id": user_id,
+        "feedback": feedback,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    await create_item(feedback_table, feedback_data, "feedback_id", "user_id")

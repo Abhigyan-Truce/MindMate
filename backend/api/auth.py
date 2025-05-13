@@ -13,7 +13,7 @@ router = APIRouter()
 async def register(user_data: UserCreate):
     """Register a new user."""
     try:
-        user = await auth_service.register_user(user_data.dict())
+        user = await auth_service.register_user(user_data.model_dump())
         return user
     except AuthException as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

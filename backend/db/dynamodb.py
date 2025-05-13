@@ -24,6 +24,7 @@ mood_entries_table = dynamodb.Table("MoodEntries")
 journal_entries_table = dynamodb.Table("JournalEntries")
 assessments_table = dynamodb.Table("Assessments")
 resources_table = dynamodb.Table("Resources")
+feedback_table = dynamodb.Table("Feedback")
 chat_history_table = dynamodb.Table("ChatHistory")
 
 # User operations
@@ -113,6 +114,14 @@ async def update_item(table, pk_value: str, pk_name: str, update_data: Dict[str,
     timestamp = get_current_timestamp()
     update_expression = "SET updated_at = :updated_at"
     expression_attribute_values = {":updated_at": timestamp}
+    expression_attribute_names = {}
+
+    # DynamoDB reserved keywords
+    reserved_keywords = [
+        "name", "timestamp", "user", "status", "date", "year", "month", "day",
+        "time", "index", "count", "size", "type", "key", "value", "order"
+    ]
+
     expression_attribute_names = {}
 
     # DynamoDB reserved keywords
