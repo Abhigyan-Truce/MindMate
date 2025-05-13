@@ -76,6 +76,46 @@ The chatbot personalizes responses based on:
 - [AI Features](AI_FEATURES.md): Documentation of the AI recommendation features
 - [Frontend README](frontend/README.md): Documentation for the frontend module
 
+## Testing
+
+The application includes comprehensive tests for all backend functionality. Tests are organized by feature and include both unit tests and integration tests.
+
+### Running Tests
+
+To run all tests:
+```bash
+source venv/bin/activate
+pytest
+```
+
+To run tests for a specific module:
+```bash
+pytest backend/tests/test_auth.py
+```
+
+To run tests with a specific marker:
+```bash
+pytest -m ai
+```
+
+### Test Structure
+
+- `backend/tests/conftest.py`: Common test fixtures and utilities
+- `backend/tests/test_*.py`: Tests organized by feature
+- `backend/tests/report.py`: Test reporting utilities
+
+### Continuous Integration
+
+The project uses GitHub Actions for continuous integration. The workflow is defined in `.github/workflows/python-tests.yml` and runs automatically when code is pushed to the main branch or when a pull request is created.
+
+The CI pipeline:
+1. Sets up a Python environment
+2. Installs dependencies
+3. Runs the tests
+4. Reports test coverage
+
+This ensures that all code changes are tested automatically before being merged.
+
 ## Getting Started
 
 ### Prerequisites
