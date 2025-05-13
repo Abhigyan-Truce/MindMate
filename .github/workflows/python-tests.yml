@@ -60,39 +60,7 @@ jobs:
         # Wait for DynamoDB to be ready
         sleep 10
         # Create tables for testing
-        python -c "
-import boto3
-import os
-
-# Set up DynamoDB client
-dynamodb = boto3.resource(
-    'dynamodb',
-    endpoint_url='http://localhost:8000',
-    region_name='us-east-1',
-    aws_access_key_id='fakeAccessKeyId',
-    aws_secret_access_key='fakeSecretAccessKey'
-)
-
-# Create tables
-tables = ['users', 'medications', 'reminders', 'moods', 'journal_entries', 'chat_messages']
-for table_name in tables:
-    try:
-        table = dynamodb.create_table(
-            TableName=table_name,
-            KeySchema=[
-                {'AttributeName': table_name[:-1] + '_id', 'KeyType': 'HASH'},
-                {'AttributeName': 'user_id', 'KeyType': 'RANGE'}
-            ],
-            AttributeDefinitions=[
-                {'AttributeName': table_name[:-1] + '_id', 'AttributeType': 'S'},
-                {'AttributeName': 'user_id', 'AttributeType': 'S'}
-            ],
-            ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}
-        )
-        print(f'Table {table_name} created successfully')
-    except Exception as e:
-        print(f'Error creating table {table_name}: {str(e)}')
-"
+        python -c "import boto3; import os; dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000', region_name='us-east-1', aws_access_key_id='fakeAccessKeyId', aws_secret_access_key='fakeSecretAccessKey'); tables = ['users', 'medications', 'reminders', 'moods', 'journal_entries', 'chat_messages']; [dynamodb.create_table(TableName=table_name, KeySchema=[{'AttributeName': table_name[:-1] + '_id', 'KeyType': 'HASH'}, {'AttributeName': 'user_id', 'KeyType': 'RANGE'}], AttributeDefinitions=[{'AttributeName': table_name[:-1] + '_id', 'AttributeType': 'S'}, {'AttributeName': 'user_id', 'AttributeType': 'S'}], ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}) for table_name in tables]"
 
     - name: Test with pytest
       run: |
