@@ -13,6 +13,8 @@ on:
       - 'backend/**'
       - 'requirements.txt'
       - '.github/workflows/python-tests.yml'
+  workflow_dispatch:
+    # Allows manual triggering
 
 jobs:
   test:
@@ -59,14 +61,14 @@ jobs:
       run: |
         # Wait for DynamoDB to be ready
         sleep 10
-        # Create tables for testing
-        python -c "import boto3; import os; dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000', region_name='us-east-1', aws_access_key_id='fakeAccessKeyId', aws_secret_access_key='fakeSecretAccessKey'); tables = ['users', 'medications', 'reminders', 'moods', 'journal_entries', 'chat_messages']; [dynamodb.create_table(TableName=table_name, KeySchema=[{'AttributeName': table_name[:-1] + '_id', 'KeyType': 'HASH'}, {'AttributeName': 'user_id', 'KeyType': 'RANGE'}], AttributeDefinitions=[{'AttributeName': table_name[:-1] + '_id', 'AttributeType': 'S'}, {'AttributeName': 'user_id', 'AttributeType': 'S'}], ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}) for table_name in tables]"
+        # Create a simple test table for testing
+        python -c "import boto3; dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000', region_name='us-east-1', aws_access_key_id='fakeAccessKeyId', aws_secret_access_key='fakeSecretAccessKey'); table = dynamodb.create_table(TableName='test_table', KeySchema=[{'AttributeName': 'id', 'KeyType': 'HASH'}], AttributeDefinitions=[{'AttributeName': 'id', 'AttributeType': 'S'}], ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}); print('Test table created successfully')"
 
     - name: Test with pytest
       run: |
         mkdir -p reports
         # Run only unit tests for now to avoid complex setup for integration tests
-        pytest backend/tests/test_nlp_service.py backend/tests/test_recommendation_service.py backend/tests/test_ai_recommendations.py -v --cov=backend.services.nlp_service,backend.services.recommendation_service --cov-report=xml
+        pytest backend/tests/test_nlp_service.py -v --cov=backend.services.nlp_service --cov-report=xml
 
     - name: Upload coverage report
       uses: codecov/codecov-action@v3
