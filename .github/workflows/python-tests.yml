@@ -78,26 +78,27 @@ jobs:
       run: |
         mkdir -p backend/tests/temp
         cat > backend/tests/temp/test_nlp_service.py << 'EOF'
-# Tests for NLP service with explicit NLTK path setup.
-import os
-import sys
-import nltk
-import pytest
+        # Tests for NLP service with explicit NLTK path setup.
+        import os
+        import sys
+        import nltk
+        import pytest
 
-# Ensure NLTK data is loaded from the correct path
-nltk.data.path = [os.environ.get('NLTK_DATA', os.path.expanduser('~/nltk_data'))]
-print(f"NLTK data path set to: {nltk.data.path}")
+        # Ensure NLTK data is loaded from the correct path
+        nltk.data.path = [os.environ.get('NLTK_DATA', os.path.expanduser('~/nltk_data'))]
+        print(f"NLTK data path set to: {nltk.data.path}")
 
-# Import the rest of the test file
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from backend.services.nlp_service import (
-    calculate_sentiment_score,
-    analyze_sentiment,
-    extract_keywords
-)
+        # Import the rest of the test file
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        from backend.services.nlp_service import (
+            calculate_sentiment_score,
+            analyze_sentiment,
+            extract_keywords
+        )
 
-@pytest.mark.unit
-def test_calculate_sentiment_score():
+        @pytest.mark.unit
+        def test_calculate_sentiment_score():
+        EOF
     """Test sentiment score calculation."""
     # Positive text
     positive_text = "I am feeling great today! Everything is wonderful."
