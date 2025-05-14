@@ -78,9 +78,7 @@ jobs:
       run: |
         mkdir -p backend/tests/temp
         cat > backend/tests/temp/test_nlp_service.py << 'EOF'
-"""
-Tests for NLP service with explicit NLTK path setup.
-"""
+# Tests for NLP service with explicit NLTK path setup.
 import os
 import sys
 import nltk
