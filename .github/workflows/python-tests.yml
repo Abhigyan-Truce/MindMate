@@ -45,7 +45,7 @@ jobs:
         export NLTK_DATA=$HOME/nltk_data
         echo "NLTK_DATA=$NLTK_DATA" >> $GITHUB_ENV
         mkdir -p $NLTK_DATA
-        python -c "import nltk; nltk.download('vader_lexicon'); nltk.download('stopwords'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger')"
+        python -c "import nltk; nltk.download('vader_lexicon'); nltk.download('stopwords'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger'); nltk.download('punkt_tab')"
 
     - name: Verify NLTK Downloads
       run: |
