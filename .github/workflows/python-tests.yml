@@ -49,7 +49,33 @@ jobs:
 
     - name: Verify NLTK Downloads
       run: |
-        python -c "import nltk; import os; print('NLTK_DATA environment variable:', os.environ.get('NLTK_DATA')); print('NLTK data path:', nltk.data.path); punkt_found = True; vader_found = True; try: punkt = nltk.data.find('tokenizers/punkt'); print('punkt found at:', punkt); except LookupError as e: print('punkt not found:', e); punkt_found = False; try: vader = nltk.data.find('sentiment/vader_lexicon.zip'); print('vader found at:', vader); except LookupError as e: print('vader not found:', e); vader_found = False; assert punkt_found and vader_found, 'Required NLTK resources not found'"
+        cat > verify_nltk.py << 'EOF'
+        import nltk
+        import os
+
+        print('NLTK_DATA environment variable:', os.environ.get('NLTK_DATA'))
+        print('NLTK data path:', nltk.data.path)
+
+        punkt_found = True
+        vader_found = True
+
+        try:
+            punkt = nltk.data.find('tokenizers/punkt')
+            print('punkt found at:', punkt)
+        except LookupError as e:
+            print('punkt not found:', e)
+            punkt_found = False
+
+        try:
+            vader = nltk.data.find('sentiment/vader_lexicon.zip')
+            print('vader found at:', vader)
+        except LookupError as e:
+            print('vader not found:', e)
+            vader_found = False
+
+        assert punkt_found and vader_found, 'Required NLTK resources not found'
+        EOF
+        python verify_nltk.py
 
     - name: Create .env file
       run: |
@@ -98,8 +124,7 @@ jobs:
 
         @pytest.mark.unit
         def test_calculate_sentiment_score():
-        EOF
-         """Test sentiment score calculation."""
+            """Test sentiment score calculation."""
             # Positive text
             positive_text = "I am feeling great today! Everything is wonderful."
             positive_score = calculate_sentiment_score(positive_text)
@@ -176,14 +201,14 @@ jobs:
             assert len(many_keywords) <= 5
         EOF
 
-            - name: Run tests
-              run: |
-                mkdir -p reports
-                # Run the modified test
-                pytest backend/tests/temp/test_nlp_service.py -v --cov=backend.services.nlp_service --cov-report=xml
+    - name: Run tests
+      run: |
+        mkdir -p reports
+        # Run the modified test
+        pytest backend/tests/temp/test_nlp_service.py -v --cov=backend.services.nlp_service --cov-report=xml
 
-            - name: Upload coverage report
-              uses: codecov/codecov-action@v3
-              with:
-                file: ./coverage.xml
-                fail_ci_if_error: false
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
