@@ -49,22 +49,7 @@ jobs:
 
     - name: Verify NLTK Downloads
       run: |
-        python -c "
-import nltk
-import os
-print('NLTK_DATA environment variable:', os.environ.get('NLTK_DATA'))
-print('NLTK data path:', nltk.data.path)
-try:
-    punkt = nltk.data.find('tokenizers/punkt')
-    print('punkt found at:', punkt)
-except LookupError as e:
-    print('punkt not found:', e)
-try:
-    vader = nltk.data.find('sentiment/vader_lexicon.zip')
-    print('vader found at:', vader)
-except LookupError as e:
-    print('vader not found:', e)
-"
+        python -c "import nltk; import os; print('NLTK_DATA environment variable:', os.environ.get('NLTK_DATA')); print('NLTK data path:', nltk.data.path); punkt_found = True; vader_found = True; try: punkt = nltk.data.find('tokenizers/punkt'); print('punkt found at:', punkt); except LookupError as e: print('punkt not found:', e); punkt_found = False; try: vader = nltk.data.find('sentiment/vader_lexicon.zip'); print('vader found at:', vader); except LookupError as e: print('vader not found:', e); vader_found = False; assert punkt_found and vader_found, 'Required NLTK resources not found'"
 
     - name: Create .env file
       run: |
