@@ -74,10 +74,8 @@ jobs:
         # Create a simple test table for testing
         python -c "import boto3; dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000', region_name='us-east-1', aws_access_key_id='fakeAccessKeyId', aws_secret_access_key='fakeSecretAccessKey'); table = dynamodb.create_table(TableName='test_table', KeySchema=[{'AttributeName': 'id', 'KeyType': 'HASH'}], AttributeDefinitions=[{'AttributeName': 'id', 'AttributeType': 'S'}], ProvisionedThroughput={'ReadCapacityUnits': 5, 'WriteCapacityUnits': 5}); print('Test table created successfully')"
 
-    - name: Test with pytest
+    - name: Create test file
       run: |
-        mkdir -p reports
-        # Create a modified version of the test file with explicit NLTK path
         mkdir -p backend/tests/temp
         cat > backend/tests/temp/test_nlp_service.py << 'EOF'
 """
@@ -179,6 +177,9 @@ def test_extract_keywords():
     assert len(many_keywords) <= 5
 EOF
 
+    - name: Run tests
+      run: |
+        mkdir -p reports
         # Run the modified test
         pytest backend/tests/temp/test_nlp_service.py -v --cov=backend.services.nlp_service --cov-report=xml
 
