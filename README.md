@@ -13,6 +13,22 @@ A comprehensive mental health support application with medicine reminder functio
 - **AI-powered Support**: Get personalized coping strategies and mental health support
 - **Resources**: Access educational content and helpful resources
 
+## User Interface
+
+### Authentication
+
+The application provides a secure and user-friendly authentication system. Users can register with their email and password or log in to their existing account.
+
+![Login Page](screenshot/loginpage.png)
+
+**Key Authentication Features:**
+- Secure JWT-based authentication
+- Password hashing with bcrypt
+- Protected routes for authenticated users
+- User profile management
+- Password change functionality
+- Session persistence across page refreshes
+
 ## AI-Powered Mental Health Support
 
 The application includes advanced AI features that provide personalized mental health support:
@@ -71,6 +87,7 @@ The chatbot personalizes responses based on:
 
 ## Documentation
 
+- [Comprehensive Documentation](document.md): Complete documentation of the entire application, including architecture, implementation details, and user workflows
 - [Postman Guide](POSTMAN_GUIDE.md): Detailed instructions for testing the API with Postman
 - [RAG Implementation](RAG_IMPLEMENTATION.md): Technical details about the RAG system
 - [AI Features](AI_FEATURES.md): Documentation of the AI recommendation features
